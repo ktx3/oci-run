@@ -1,0 +1,6 @@
+# This is free and unencumbered software released into the public domain.
+
+[submodule "oci-entrypoint"]
+    branch = main
+    path = oci-entrypoint
+    url = ../oci-entrypoint.git
