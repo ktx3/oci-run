@@ -7,7 +7,7 @@ edition = "2021"
 license = "Unlicense"
 name = "oci-run"
 publish = false
-version = "0.1.0"
+version = "0.1.1"
 
 [profile.release]
 codegen-units = 1
