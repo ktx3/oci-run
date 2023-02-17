@@ -33,7 +33,7 @@ fn get_config() -> Result<Config, Box<dyn Error>> {
 
     Dispatch::new()
         .format(|out, msg, rec| {
-            out.finish(format_args!("oci-run: [{}] {}", rec.level(), msg));
+            out.finish(format_args!("oci-run: [{}] {msg}", rec.level()));
         })
         .level(if cli.debug() { level } else { LevelFilter::Off })
         .level_for("oci_run", level)
@@ -41,7 +41,7 @@ fn get_config() -> Result<Config, Box<dyn Error>> {
         .apply()?;
 
     let config = Config::try_from(cli)?;
-    debug!("config: {:#?}", config);
+    debug!("config: {config:#?}");
     Ok(config)
 }
 
@@ -79,7 +79,7 @@ fn run(config: &Config) -> Result<(), Box<dyn Error>> {
     ));
 
     if let Some(user) = &profile.user {
-        cmd.push(format!("--env=USER_NAME={}", user));
+        cmd.push(format!("--env=USER_NAME={user}"));
     }
 
     cmd.push(format!(
@@ -110,15 +110,15 @@ fn run(config: &Config) -> Result<(), Box<dyn Error>> {
     // Environment variables
     for (key, value) in &profile.env {
         if let Some(s) = value {
-            cmd.push(format!("--env={}={}", key, s));
+            cmd.push(format!("--env={key}={s}"));
         } else {
-            cmd.push(format!("--env={}", key));
+            cmd.push(format!("--env={key}"));
         }
     }
 
     // Workdir
     if let Some(workdir) = &profile.workdir {
-        cmd.push(format!("--workdir={}", workdir));
+        cmd.push(format!("--workdir={workdir}"));
     }
 
     // Volume mounts
@@ -164,15 +164,15 @@ fn run(config: &Config) -> Result<(), Box<dyn Error>> {
     cmd.push(profile.image.clone());
     cmd.extend(config.command.iter().cloned());
 
-    debug!("command: {:#?}", cmd);
+    debug!("command: {cmd:#?}");
     Command::new(&cmd[0]).args(&cmd[1..]).exec();
-    Err(format!("command failed: {:?}", cmd).into())
+    Err(format!("command failed: {cmd:?}").into())
 }
 
 /// Main entrypoint.
 fn main() {
     if let Err(err) = get_config().and_then(|config| run(&config)) {
-        eprintln!("oci-run: {}", err);
+        eprintln!("oci-run: {err}");
         process::exit(1);
     }
 }
