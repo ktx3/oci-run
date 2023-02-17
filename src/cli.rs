@@ -4,7 +4,7 @@
 
 use std::path::PathBuf;
 
-use clap::Parser;
+use clap::{ArgAction, Parser};
 
 /// Command-line options.
 #[derive(Debug, Parser)]
@@ -14,7 +14,7 @@ pub struct Cli {
     #[clap(last = true)]
     pub command: Vec<String>,
     /// Path to the config file.
-    #[clap(long, parse(from_os_str), short, value_name = "PATH")]
+    #[clap(long, short, value_name = "PATH", value_parser)]
     pub config_file: Option<PathBuf>,
     /// Enable additional debug logging.
     #[clap(long, short)]
@@ -23,11 +23,11 @@ pub struct Cli {
     #[clap(long, short, value_name = "PROFILE")]
     pub profile: Option<PathBuf>,
     /// Decrease logging verbosity.
-    #[clap(long, parse(from_occurrences), short)]
-    pub quiet: u64,
+    #[clap(action = ArgAction::Count, long, short)]
+    pub quiet: u8,
     /// Increase logging verbosity.
-    #[clap(long, parse(from_occurrences), short)]
-    pub verbose: u64,
+    #[clap(action = ArgAction::Count, long, short)]
+    pub verbose: u8,
 }
 
 impl Cli {
@@ -39,7 +39,7 @@ impl Cli {
 
     /// Get logging verbosity.
     #[must_use]
-    pub fn verbosity(&self) -> u64 {
+    pub fn verbosity(&self) -> u8 {
         // Show warnings and above by default
         self.verbose.saturating_add(2).saturating_sub(self.quiet)
     }
